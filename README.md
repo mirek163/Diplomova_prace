@@ -1,5 +1,5 @@
 # Metody generování 3D prostředí založené na strojovém učení
-##21.10-27.10
+## 21.10-27.10
 Nenašel jsem dataset s 3D daty pro trénování mé sítě.
 1) Vzít poly-low objekt z netu a rozšířit si ho.
 2) Vzít objekty např. z minecraftu a vyexportovat je jako .obj
@@ -10,7 +10,7 @@ Po počátečním průzkumu datasetů jsem se rozhodl vytvořit vlastní sadu da
 Nainstaloval jsem si Blender, kde jsem se seznámil se základními funkcemi a vytvořil skript, který mi umožňuje otáčet objekty kolem Y osy a exportovat je jako .obj.
 Objekt sice otáčím, ale myslím si, že to nebude dostatečný, tedy jsem vyříznul okno v budově objektu, udělat ho jako samostatný objekt a následně udělat skript pro náhodné umistování po ploše budovy. 
 
-##4.10-10.11
+## 4.10-10.11
 Počátčení trénování sítě?
 spojení obou skriptů dohromady?
 vyřešení umistování objektu po všech stranách?
