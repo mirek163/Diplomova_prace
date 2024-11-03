@@ -6,7 +6,7 @@ Nenašel jsem dataset s 3D daty pro trénování mé sítě.
 Po počátečním průzkumu datasetů jsem se rozhodl vytvořit vlastní sadu dat tím, že budu generovat variace z jednoho objektu z netu pomocí augmentace. 
  Snaha o generaci objektu skrze čistý Python - bez úspěchu.
 
-##28.10-3.11
+## 28.10-3.11
 Nainstaloval jsem si Blender, kde jsem se seznámil se základními funkcemi a vytvořil skript, který mi umožňuje otáčet objekty kolem Y osy a exportovat je jako .obj.
 Objekt sice otáčím, ale myslím si, že to nebude dostatečný, tedy jsem vyříznul okno v budově objektu, udělat ho jako samostatný objekt a následně udělat skript pro náhodné umistování po ploše budovy. 
 
