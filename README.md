@@ -13,7 +13,13 @@ Nainstaloval jsem si Blender, kde jsem se seznámil se základními funkcemi a v
 Objekt sice otáčím, ale myslím si, že to nebude dostatečný, tedy jsem vyříznul okno v budově objektu, udělat ho jako samostatný objekt a následně udělat skript pro náhodné umistování po ploše budovy. 
 
 ## 4.10-10.11
-Počátčení trénování sítě?
-spojení obou skriptů dohromady?
-vyřešení umistování objektu po všech stranách?
+Vyřešil jsem některé problémy s oknem
+  - objekt window překryl objektem building - boolean aplikace
+  - vytvářím kopie objektů, které po skončení cyklu odstraňuju
+  - spojil jsem ukládání u rotace s pohybem okna, tedy nyní ukládám variace dle potřeby.
+    
+- [ ] - Počátčení trénování sítě?
+- [x] -  spojení obou skriptů dohromady?
+- [ ] -  vyřešení umistování objektu po všech stranách?
+- [ ] - odstranění nějakým způsobem okno, které bylo původně na budově?
 
