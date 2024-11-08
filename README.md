@@ -17,9 +17,10 @@ Vyřešil jsem některé problémy s oknem
   - objekt window překryl objektem building - boolean aplikace
   - vytvářím kopie objektů, které po skončení cyklu odstraňuju
   - spojil jsem ukládání u rotace s pohybem okna, tedy nyní ukládám variace dle potřeby.
+  - udělal jsme nějakou základní gan sít, která pracuje s 3d objekty, přestože zatím pořad modely převádím zle
     
-- [ ] - Počátčení trénování sítě?
+- [x] - Počátčení trénování sítě? => Problém s přenosem obj do voxel podoby.
 - [x] -  spojení obou skriptů dohromady?
-- [ ] -  vyřešení umistování objektu po všech stranách?
-- [ ] - odstranění nějakým způsobem okno, které bylo původně na budově?
+- [ ] -  vyřešení umistování objektu po všech stranách? => zatím není nutné, nejprve se budu soustředit na sít, inputy nejake mam. 
+- [ ] - odstranění nějakým způsobem okno, které bylo původně na budově? => stejná odpověd, jako s umístěním po všech stranach budovy. Tohle rozšíření mužu udělat, až začnu dobře trénovat.
 
