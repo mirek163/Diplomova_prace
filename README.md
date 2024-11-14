@@ -24,3 +24,9 @@ Vyřešil jsem některé problémy s oknem
 - [ ] -  vyřešení umistování objektu po všech stranách? => zatím není nutné, nejprve se budu soustředit na sít, inputy nejake mam. 
 - [ ] - odstranění nějakým způsobem okno, které bylo původně na budově? => stejná odpověd, jako s umístěním po všech stranach budovy. Tohle rozšíření mužu udělat, až začnu dobře trénovat.
 
+## 11.11.-14.11
+Pořád řeším převod objektu na správné rozměry. Převádím objekt z formátu .obj do voxel formátu. Vybrán voxel dle rešerše místo cloud z mé výzkumné práce. Objekt se správně překládá do Voxel podoby, sít nicméně vyžaduje rozměry 32x32x32. Využíval jsem funkci zoom, jelikož muj objekt nemá stejné velikosti x,y,z a tímto bych měl být schopen udělat lineární interpolaci. Bohužel zde narážím na problém, že objekt je například na jedné stráně oříznut. Pokusil jsem se udělat tyto úpravy v blenderu. Rozměry 32x32x32 jsem sice nastavil, ale potýkal jsem se s tím, že síť velmi dlouho trvala a nakonec jsem to musel ukončit. pokusil jsem se převést objekt na různé variance a to vydělením 32, nastavení rozměrů 0,32x0,32x0,32 atp. bohužel bez úspěchu. Zkusím se ještě podívat více na funkci zoom, dle mého by to mělo dělat přesně co potřebuji.
+
+Pro účely testování jsem udělal funkci na jednoduché zobrazování objketu skrze matplotlib.
+
+
