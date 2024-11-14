@@ -3,5 +3,5 @@
 import processing_obj as prc
 
 #Problem.
-object = prc.obj_to_voxel("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA\\output\\window_move\\variant_1.obj")
+object = prc.obj_to_voxel("/small_buildingA/output/window_move/variant_1.obj")
 prc.voxel_to_obj(object,"test.obj")

@@ -10,6 +10,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # Snaha pr
 
 #načtení objektů
 data_directory = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\window_move"
+#data_directory = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\test3"
 obj_files = glob.glob(os.path.join(data_directory, "*.obj"))
 
 if not obj_files:
@@ -92,8 +93,9 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
 
 if __name__ == "__main__":
     # zobraz objekt pyplotu jen pro kontrolu
-    voxel_grid = prc.obj_to_voxel("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA"
+    voxel_grid = prc.obj_to_voxel2("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA"
                                   "\\output\\window_move\\variant_1.obj")
+    #voxel_grid=prc.obj_to_voxel2("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA\\output\\test3\\0_032.obj")
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.voxels(voxel_grid, edgecolor='k')
@@ -103,7 +105,6 @@ if __name__ == "__main__":
     voxel_data = [prc.obj_to_voxel(filepath) for filepath in obj_files]
     data_loader = torch.utils.data.DataLoader(voxel_data, batch_size=32, shuffle=True)
 
-    # GAN
     latent_dim = 100
     generator = Generator(latent_dim=latent_dim, output_dim=32 * 32 * 32)
     discriminator = Discriminator(input_dim=32 * 32 * 32)
