@@ -10,11 +10,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # Snaha pr
 
 #načtení objektů
 data_directory = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\window_move"
-#data_directory = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\test3"
+#data_directory = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\test_scale_blender"
 obj_files = glob.glob(os.path.join(data_directory, "*.obj"))
 
 if not obj_files:
-    raise FileNotFoundError(f"No .obj files found in directory: {data_directory}")
+    raise FileNotFoundError(f"Nenašel se žadny obj file: {data_directory}")
 
 
 class Generator(nn.Module):
@@ -72,9 +72,6 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
             # Generator
             #for _ in range(2):  # mam nizky hodnoty u generatoru
             optimizer_g.zero_grad()
-            # Generate new fake data for each iteration (new computation graph)
-            #z = torch.randn(real_voxels.size(0), latent_dim).to(device)
-            #fake_voxels = generator(z)
             g_loss = criterion(discriminator(fake_voxels), real_labels)
             g_loss.backward()
             optimizer_g.step()
@@ -82,8 +79,8 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
         print(f"Epoch [{epoch + 1}/{num_epochs}] | D Loss: {d_loss.item():.4f} | G Loss: {g_loss.item():.4f}")
 
         # Lehká rychlá vizualizace
-        if (epoch + 1) % 10000 == 0:
-            print(f"Visualizing voxel grid at epoch {epoch + 1}")
+        if (epoch + 1) % 1000 == 0:
+            print(f"Vizualizace mřížky pro epochu {epoch + 1}")
             z = torch.randn(1, latent_dim)
             generated_voxel = generator(z).detach().numpy().squeeze()
             fig = plt.figure()
@@ -92,16 +89,11 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
             plt.show()
 
 if __name__ == "__main__":
-    # zobraz objekt pyplotu jen pro kontrolu
-    voxel_grid = prc.obj_to_voxel2("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA"
-                                  "\\output\\window_move\\variant_1.obj")
-    #voxel_grid=prc.obj_to_voxel2("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA\\output\\test3\\0_032.obj")
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.voxels(voxel_grid, edgecolor='k')
-    plt.show()
+    # zobraz objekt z datasetu pyplotu jen pro kontrolu
+    voxel_grid = prc.obj_to_voxel("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA"
+                                  "\\output\\window_move\\variant_1.obj", show=True)
 
-    # Preprocess
+    # Preproces
     voxel_data = [prc.obj_to_voxel(filepath) for filepath in obj_files]
     data_loader = torch.utils.data.DataLoader(voxel_data, batch_size=32, shuffle=True)
 

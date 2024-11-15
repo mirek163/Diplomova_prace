@@ -1,35 +1,97 @@
 import trimesh
+from matplotlib import pyplot as plt
 from scipy.ndimage import zoom
 import numpy as np
 
+def obj_to_voxel(filepath, grid_size=32, show=False):
 
-def obj_to_voxel(filepath, grid_size=32):
     mesh = trimesh.load(filepath, force='mesh')
-    voxels = mesh.voxelized(pitch=1 / grid_size)
-    voxel_matrix = voxels.matrix
+    # scale za pomocí pythonu (mohu nechat v blenderu default hodnoty)
+    bounds = mesh.bounds  #[min, max]
+    dimensions = bounds[1] - bounds[0]
+    pitch=1/32 # něco špatně :(
+    scale_factor = (grid_size-1)*pitch / max(dimensions) # -1 protože to zakruhluje nahoru a může to přesáhnout
+    mesh.apply_scale(scale_factor)
 
-    # Uprav velikosti
-    scale_factors = (
-        grid_size / voxel_matrix.shape[0],
-        grid_size / voxel_matrix.shape[1],
-        grid_size / voxel_matrix.shape[2]
-    )
-    resized_voxel = zoom(voxel_matrix, scale_factors, order=1)  # linearní interpolace - resample velikosti stejnou velikost voxel (32x32x32)
-
-    return resized_voxel.astype(np.float32)
-
-def obj_to_voxel2(filepath, grid_size=16):
-    mesh = trimesh.load(filepath, force='mesh')
-
-    pitch = 1 / (grid_size) # čím menší pitch, tím větší hustota voxelů (64 voxelu za jednotku)
     voxels = mesh.voxelized(pitch=pitch)
     voxel_matrix = voxels.matrix
-    return voxel_matrix.astype(np.float32)
+    print(f"Voxel dimenze: {voxel_matrix.shape}")
+    new_matrix=pad_to_32x32x32(voxel_matrix)
 
+    # vizualizace
+    if show:
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.voxels(new_matrix, edgecolor='k')
+        plt.show()
+    return new_matrix.astype(np.float32)
+
+def pad_to_32x32x32(voxel_matrix):
+    current_shape = voxel_matrix.shape
+    if current_shape[0] > 32 or current_shape[1] > 32 or current_shape[2] > 32:
+        raise ValueError("Velikost matice je větší -> sniž pod 32x32x32")
+
+    pad_x = 32 - current_shape[0]
+    pad_y = 32 - current_shape[1]
+    pad_z = 32 - current_shape[2]
+
+    padding = [
+        (pad_x // 2, pad_x - pad_x // 2),
+        (pad_y // 2, pad_y - pad_y // 2),
+        (pad_z // 2, pad_z - pad_z // 2),
+    ]
+    padded_matrix = np.pad(voxel_matrix, pad_width=padding, mode='constant', constant_values=0)
+    print(f"Dimenze matice s padding: {padded_matrix.shape}")
+    return padded_matrix
 
 def voxel_to_obj(voxel_grid, output_filepath):
     # vxytvoř mesh z voxelu
     voxels = trimesh.voxel.VoxelGrid(voxel_grid)
     mesh = voxels.marching_cubes
     mesh.export(output_filepath)
+
+    #--------------------------------------
+    #TESTING - NOT USED CURRENTLY FREQUENTLY
+    #--------------------------------------
+def obj_to_voxel_zoom(filepath, grid_size=32):
+    # snaha udelaní linearní interpolace a nastavení objektu na 32x32x32
+    # -> později jsem zvolil nynější metodu, kde doplnuju chybějící mezery 0.
+    pitch = 1/(grid_size)
+    mesh = trimesh.load(filepath, force='mesh')
+    voxels = mesh.voxelized(pitch=pitch)
+    voxel_matrix = voxels.matrix
+    print(f"1.{voxel_matrix.shape}")
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.voxels(voxel_matrix, edgecolor='k')
+    plt.show()
+    # Uprav velikosti
+    scale_factors = (
+        grid_size / voxel_matrix.shape[0],
+        grid_size / voxel_matrix.shape[1],
+        grid_size / voxel_matrix.shape[2]
+    )
+    resized_voxel = zoom(voxel_matrix, scale_factors, order=1, grid_mode=False, cval=0.0, mode='constant')  # linearní interpolace - resample velikosti stejnou velikost voxel (32x32x32)
+    print(f"2.{resized_voxel.shape}")
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.voxels(resized_voxel, edgecolor='k')
+    plt.show()
+
+    return resized_voxel.astype(np.float32)
+
+
+def obj_to_voxel_default(filepath, grid_size=32):
+    #převedení bez úprav, zde pitch funguje, avšak nedostavam požadovanou velikost pro mou sít
+    mesh = trimesh.load(filepath, force='mesh')
+
+    pitch = 1 / (grid_size) # čím menší pitch, tím větší hustota voxelů (64 voxelu za jednotku)
+    voxels = mesh.voxelized(pitch=pitch)
+    voxel_matrix = voxels.matrix
+    print(voxel_matrix.shape)
+    return voxel_matrix.astype(np.float32)
+
+
 
