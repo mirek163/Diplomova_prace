@@ -7,14 +7,18 @@ import processing_obj as prc
 import matplotlib.pyplot as plt
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # Snaha pro využití grafiky
+#globální parametry
 
-#načtení objektů
-data_directory = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\window_move"
-#data_directory = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\test_scale_blender"
-obj_files = glob.glob(os.path.join(data_directory, "*.obj"))
+LATENT_DIM = 100              #latentní dimenze->výstup generátoru
+EPOCHS = 10000               #počet epoch pro trénování
+BATCH_SIZE = 32              #velikost pro trénování
+LR = 0.0002                  #rychlost pro generator a diskriminator
+DATA_DIRECTORY = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\window_move"
+
+obj_files = glob.glob(os.path.join(DATA_DIRECTORY, "*.obj"))
 
 if not obj_files:
-    raise FileNotFoundError(f"Nenašel se žadny obj file: {data_directory}")
+    raise FileNotFoundError(f"Nenašel se žadny obj file: {DATA_DIRECTORY}")
 
 
 class Generator(nn.Module):
@@ -49,8 +53,8 @@ class Discriminator(nn.Module):
 
 def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=100):
     criterion = nn.BCELoss()
-    optimizer_g = optim.Adam(generator.parameters(), lr=0.0002)
-    optimizer_d = optim.Adam(discriminator.parameters(), lr=0.0002)
+    optimizer_g = optim.Adam(generator.parameters(), lr=LR)
+    optimizer_d = optim.Adam(discriminator.parameters(), lr=LR)
 
     for epoch in range(num_epochs):
         for real_voxels in data_loader:
@@ -90,20 +94,18 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
 
 if __name__ == "__main__":
     # zobraz objekt z datasetu pyplotu jen pro kontrolu
-    voxel_grid = prc.obj_to_voxel("C:\\Users\\Lenovo\\Desktop\\Diplomova_prace\\blender\\object\\small_buildingA"
-                                  "\\output\\window_move\\variant_1.obj", show=True)
+    voxel_grid = prc.obj_to_voxel(os.path.join(DATA_DIRECTORY, "variant_1.obj"), show=True)
 
     # Preproces
     voxel_data = [prc.obj_to_voxel(filepath) for filepath in obj_files]
-    data_loader = torch.utils.data.DataLoader(voxel_data, batch_size=32, shuffle=True)
+    data_loader = torch.utils.data.DataLoader(voxel_data, batch_size=BATCH_SIZE, shuffle=True)
 
-    latent_dim = 100
-    generator = Generator(latent_dim=latent_dim, output_dim=32 * 32 * 32)
+    generator = Generator(latent_dim=LATENT_DIM, output_dim=32 * 32 * 32)
     discriminator = Discriminator(input_dim=32 * 32 * 32)
 
-    train_gan(generator, discriminator, data_loader, num_epochs=10000, latent_dim=latent_dim)
+    train_gan(generator, discriminator, data_loader, num_epochs=EPOCHS, latent_dim=LATENT_DIM)
 
     # Generuj objekt
-    z = torch.randn(1, latent_dim)
+    z = torch.randn(1, LATENT_DIM)
     generated_voxel = generator(z).detach().numpy().squeeze()
     prc.voxel_to_obj(generated_voxel, "generated_object.obj")
