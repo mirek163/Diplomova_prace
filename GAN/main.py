@@ -95,13 +95,12 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
 
         print(f"Epoch [{epoch + 1}/{num_epochs}] | D Loss: {d_loss.item():.4f} | G Loss: {g_loss.item():.4f}")
 
-        # Lehká rychlá vizualizace
 
         if (epoch + 1) % EPOCHS_WEIGHT == 0:
             torch.save(generator.state_dict(), os.path.join(SAVE_DIR, f"generator_{epoch + 1}.pth"))
             torch.save(discriminator.state_dict(), os.path.join(SAVE_DIR, f"discriminator_{epoch + 1}.pth"))
             print(f"Váhy pro generátor a diskriminátor při epoše : {epoch+1} byly uloženy.")
-
+            # Lehká rychlá vizualizace
             if EPOCHS_VISUALIZATION:
                 print(f"Vizualizace mřížky pro epochu {epoch + 1}")
                 z = torch.randn(1, latent_dim).to(device)
