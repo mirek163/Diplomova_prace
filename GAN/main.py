@@ -5,6 +5,8 @@ import torch.nn as nn
 import torch.optim as optim
 import processing_obj as prc
 import matplotlib.pyplot as plt
+from tqdm import tqdm
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"zařízení: {device}")
@@ -113,8 +115,13 @@ if __name__ == "__main__":
     # zobraz objekt z datasetu pyplotu jen pro kontrolu
     voxel_grid = prc.obj_to_voxel(os.path.join(DATA_DIRECTORY, "variant_1.obj"), show=True)
 
+    # fancy bar pro načtení obj souborů.
+    print("Převod .obj souborů na voxel mřížku:")
+    voxel_data = []
+    for filepath in tqdm(obj_files, desc="Načtení .obj souborů"):
+        voxel_data.append(prc.obj_to_voxel(filepath))
+
     # Preproces
-    voxel_data = [prc.obj_to_voxel(filepath) for filepath in obj_files]
     data_loader = torch.utils.data.DataLoader(voxel_data, batch_size=BATCH_SIZE, shuffle=True)
 
     generator = Generator(latent_dim=LATENT_DIM, output_dim=32 * 32 * 32).to(device)

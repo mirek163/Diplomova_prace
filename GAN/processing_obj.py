@@ -15,12 +15,13 @@ def obj_to_voxel(filepath, grid_size=32, show=False):
 
     voxels = mesh.voxelized(pitch=pitch)
     voxel_matrix = voxels.matrix
-    print(f"Voxel dimenze: {voxel_matrix.shape}")
     new_matrix=pad_to_32x32x32(voxel_matrix)
     #print(new_matrix)
 
     # vizualizace
     if show:
+        print(f"Voxel dimenze: {voxel_matrix.shape}")
+        print(f"Dimenze matice s padding: {new_matrix.shape}")
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         ax.voxels(new_matrix, edgecolor='k')
@@ -42,7 +43,6 @@ def pad_to_32x32x32(voxel_matrix):
         (pad_z // 2, pad_z - pad_z // 2),
     ]
     padded_matrix = np.pad(voxel_matrix, pad_width=padding, mode='constant', constant_values=0)
-    print(f"Dimenze matice s padding: {padded_matrix.shape}")
     return padded_matrix
 
 def voxel_to_obj(voxel_grid, output_filepath):
