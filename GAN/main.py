@@ -1,3 +1,4 @@
+import atexit
 import glob
 import os
 import torch
@@ -7,20 +8,18 @@ import processing_obj as prc
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"zařízení: {device}")
-#globální parametry
+# globální parametry
 
-LATENT_DIM = 100              #latentní dimenze->výstup generátoru
-EPOCHS = 10               #počet epoch pro trénování
-BATCH_SIZE = 32              #velikost pro trénování
-LR = 0.0002                  #rychlost pro generator a diskriminator
+LATENT_DIM = 100  # latentní dimenze->výstup generátoru
+EPOCHS = 10000  # počet epoch pro trénování
+BATCH_SIZE = 32  # velikost pro trénování
+LR = 0.0002  # rychlost pro generator a diskriminator
 DATA_DIRECTORY = r"..\blender\object\small_buildingA\output\window_move"
-SAVE_DIR = "weights" # váhy vygenerované při tréninku
-EPOCHS_WEIGHT = 10
+SAVE_DIR = "weights"  # váhy vygenerované při tréninku
+EPOCHS_WEIGHT = 1000
 EPOCHS_VISUALIZATION = False
-
 
 obj_files = glob.glob(os.path.join(DATA_DIRECTORY, "*.obj"))
 os.makedirs(SAVE_DIR, exist_ok=True)
@@ -60,8 +59,10 @@ class Discriminator(nn.Module):
             nn.Linear(256, 1),
             nn.Sigmoid()
         )
+
     def forward(self, voxel):
         return self.model(voxel.view(voxel.size(0), -1))
+
 
 def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=100):
     criterion = nn.BCELoss()
@@ -74,7 +75,7 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
             optimizer_d.zero_grad()
             real_labels = torch.ones(real_voxels.size(0), 1).to(device)
             fake_labels = torch.zeros(real_voxels.size(0), 1).to(device)
-            real_voxels = real_voxels.to(device) # pojištění, že to pojedu přes gpu
+            real_voxels = real_voxels.to(device)  # pojištění, že to pojedu přes gpu
 
             real_loss = criterion(discriminator(real_voxels), real_labels)
 
@@ -87,7 +88,7 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
             optimizer_d.step()
 
             # Generator
-            #for _ in range(2):  # mam nizky hodnoty u generatoru
+            # for _ in range(2):  # mam nizky hodnoty u generatoru
             optimizer_g.zero_grad()
             g_loss = criterion(discriminator(fake_voxels), real_labels)
             g_loss.backward()
@@ -95,20 +96,29 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
 
         print(f"Epoch [{epoch + 1}/{num_epochs}] | D Loss: {d_loss.item():.4f} | G Loss: {g_loss.item():.4f}")
 
-
         if (epoch + 1) % EPOCHS_WEIGHT == 0:
-            torch.save(generator.state_dict(), os.path.join(SAVE_DIR, f"generator_{epoch + 1}.pth"))
-            torch.save(discriminator.state_dict(), os.path.join(SAVE_DIR, f"discriminator_{epoch + 1}.pth"))
-            print(f"Váhy pro generátor a diskriminátor při epoše : {epoch+1} byly uloženy.")
+            current_epoch = epoch + 1
+            save_weights(version=str(current_epoch))
+            print(f"Váhy pro generátor a diskriminátor při epoše : {current_epoch} byly uloženy.")
+
             # Lehká rychlá vizualizace
             if EPOCHS_VISUALIZATION:
-                print(f"Vizualizace mřížky pro epochu {epoch + 1}")
+                print(f"Vizualizace mřížky pro epochu {current_epoch}")
                 z = torch.randn(1, latent_dim).to(device)
-                generated_voxel = generator(z).detach().cpu().numpy().squeeze() # použití cpu misto gpu - pro použití numpy nezbytný
+                generated_voxel = generator(
+                    z).detach().cpu().numpy().squeeze()  # použití cpu misto gpu - pro použití numpy nezbytný
                 fig = plt.figure()
                 ax = fig.add_subplot(111, projection='3d')
                 ax.voxels(generated_voxel > 0, edgecolor='k')
                 plt.show()
+
+
+def save_weights(version="latest"):
+    torch.save(generator.state_dict(), os.path.join(SAVE_DIR, f"generator_{version}.pth"))
+    torch.save(discriminator.state_dict(), os.path.join(SAVE_DIR, f"discriminator_{version}.pth"))
+    if version == "latest":
+        print("Váhy byly uloženy při ukončení programu.")
+
 
 if __name__ == "__main__":
     # zobraz objekt z datasetu pyplotu jen pro kontrolu
@@ -125,10 +135,17 @@ if __name__ == "__main__":
 
     generator = Generator(latent_dim=LATENT_DIM, output_dim=32 * 32 * 32).to(device)
     discriminator = Discriminator(input_dim=32 * 32 * 32).to(device)
-    #print(f"generator: {next(generator.parameters()).device}")
-    #print(f"diskriminator: {next(discriminator.parameters()).device}")
+    #----- ověření, zda se sít trenuje na gpu: -----
+    # print(f"generator: {next(generator.parameters()).device}")
+    # print(f"diskriminator: {next(discriminator.parameters()).device}")
 
-    train_gan(generator, discriminator, data_loader, num_epochs=EPOCHS, latent_dim=LATENT_DIM)
+    #atexit.register(lambda: save_weights())  # uložení vah při "stop" programu , načtení až po modelu ->lambda
+    try:
+        train_gan(generator, discriminator, data_loader, num_epochs=EPOCHS, latent_dim=LATENT_DIM)
+    except Exception as e:
+        print(f"\nDošlo k chybě během trénování: {e}")
+    finally:
+        save_weights()
 
     # Generuj objekt
     z = torch.randn(1, LATENT_DIM).to(device)
