@@ -5,17 +5,21 @@ import torch.nn as nn
 import torch.optim as optim
 import processing_obj as prc
 import matplotlib.pyplot as plt
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') # Snaha pro využití grafiky
+#pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu112
+#nvidia-smi
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
 #globální parametry
 
 LATENT_DIM = 100              #latentní dimenze->výstup generátoru
 EPOCHS = 10000               #počet epoch pro trénování
 BATCH_SIZE = 32              #velikost pro trénování
 LR = 0.0002                  #rychlost pro generator a diskriminator
-DATA_DIRECTORY = r"C:\Users\Lenovo\Desktop\Diplomova_prace\blender\object\small_buildingA\output\window_move"
+DATA_DIRECTORY = r"..\blender\object\small_buildingA\output\window_move"
+SAVE_DIR = "weights" # váhy vygenerované při tréninku
 
 obj_files = glob.glob(os.path.join(DATA_DIRECTORY, "*.obj"))
+os.makedirs(SAVE_DIR, exist_ok=True)
 
 if not obj_files:
     raise FileNotFoundError(f"Nenašel se žadny obj file: {DATA_DIRECTORY}")

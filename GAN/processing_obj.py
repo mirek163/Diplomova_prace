@@ -17,6 +17,7 @@ def obj_to_voxel(filepath, grid_size=32, show=False):
     voxel_matrix = voxels.matrix
     print(f"Voxel dimenze: {voxel_matrix.shape}")
     new_matrix=pad_to_32x32x32(voxel_matrix)
+    #print(new_matrix)
 
     # vizualizace
     if show:
