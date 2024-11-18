@@ -5,10 +5,9 @@ import torch.nn as nn
 import torch.optim as optim
 import processing_obj as prc
 import matplotlib.pyplot as plt
-#pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu112
-#nvidia-smi
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(device)
+print(f"zařízení: {device}")
 #globální parametry
 
 LATENT_DIM = 100              #latentní dimenze->výstup generátoru
