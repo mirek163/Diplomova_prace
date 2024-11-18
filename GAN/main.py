@@ -11,11 +11,14 @@ print(f"zařízení: {device}")
 #globální parametry
 
 LATENT_DIM = 100              #latentní dimenze->výstup generátoru
-EPOCHS = 10000               #počet epoch pro trénování
+EPOCHS = 10               #počet epoch pro trénování
 BATCH_SIZE = 32              #velikost pro trénování
 LR = 0.0002                  #rychlost pro generator a diskriminator
 DATA_DIRECTORY = r"..\blender\object\small_buildingA\output\window_move"
 SAVE_DIR = "weights" # váhy vygenerované při tréninku
+EPOCHS_WEIGHT = 10
+EPOCHS_VISUALIZATION = False
+
 
 obj_files = glob.glob(os.path.join(DATA_DIRECTORY, "*.obj"))
 os.makedirs(SAVE_DIR, exist_ok=True)
@@ -28,11 +31,13 @@ class Generator(nn.Module):
     def __init__(self, latent_dim, output_dim):
         super(Generator, self).__init__()
         self.model = nn.Sequential(
-            nn.Linear(latent_dim, 128),
+            nn.Linear(latent_dim, 256),
             nn.ReLU(),
-            nn.Linear(128, 256),
+            nn.Linear(256, 512),
             nn.ReLU(),
-            nn.Linear(256, output_dim),
+            nn.Linear(512, 1024),
+            nn.ReLU(),
+            nn.Linear(1024, output_dim),
             nn.Tanh()
         )
 
@@ -44,11 +49,13 @@ class Discriminator(nn.Module):
     def __init__(self, input_dim):
         super(Discriminator, self).__init__()
         self.model = nn.Sequential(
-            nn.Linear(input_dim, 256),
+            nn.Linear(input_dim, 1024),
             nn.LeakyReLU(0.2),
-            nn.Linear(256, 128),
+            nn.Linear(1024, 512),
             nn.LeakyReLU(0.2),
-            nn.Linear(128, 1),
+            nn.Linear(512, 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, 1),
             nn.Sigmoid()
         )
     def forward(self, voxel):
@@ -63,12 +70,13 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
         for real_voxels in data_loader:
             # Discriminator
             optimizer_d.zero_grad()
-            real_labels = torch.ones(real_voxels.size(0), 1)
-            fake_labels = torch.zeros(real_voxels.size(0), 1)
+            real_labels = torch.ones(real_voxels.size(0), 1).to(device)
+            fake_labels = torch.zeros(real_voxels.size(0), 1).to(device)
+            real_voxels = real_voxels.to(device) # pojištění, že to pojedu přes gpu
 
             real_loss = criterion(discriminator(real_voxels), real_labels)
 
-            z = torch.randn(real_voxels.size(0), latent_dim)
+            z = torch.randn(real_voxels.size(0), latent_dim).to(device)
             fake_voxels = generator(z)
             fake_loss = criterion(discriminator(fake_voxels.detach()), fake_labels)
 
@@ -86,14 +94,20 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
         print(f"Epoch [{epoch + 1}/{num_epochs}] | D Loss: {d_loss.item():.4f} | G Loss: {g_loss.item():.4f}")
 
         # Lehká rychlá vizualizace
-        if (epoch + 1) % 1000 == 0:
-            print(f"Vizualizace mřížky pro epochu {epoch + 1}")
-            z = torch.randn(1, latent_dim)
-            generated_voxel = generator(z).detach().numpy().squeeze()
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-            ax.voxels(generated_voxel > 0, edgecolor='k')
-            plt.show()
+
+        if (epoch + 1) % EPOCHS_WEIGHT == 0:
+            torch.save(generator.state_dict(), os.path.join(SAVE_DIR, f"generator_{epoch + 1}.pth"))
+            torch.save(discriminator.state_dict(), os.path.join(SAVE_DIR, f"discriminator_{epoch + 1}.pth"))
+            print(f"Váhy pro generátor a diskriminátor při epoše : {epoch+1} byly uloženy.")
+
+            if EPOCHS_VISUALIZATION:
+                print(f"Vizualizace mřížky pro epochu {epoch + 1}")
+                z = torch.randn(1, latent_dim).to(device)
+                generated_voxel = generator(z).detach().cpu().numpy().squeeze() # použití cpu misto gpu - pro použití numpy nezbytný
+                fig = plt.figure()
+                ax = fig.add_subplot(111, projection='3d')
+                ax.voxels(generated_voxel > 0, edgecolor='k')
+                plt.show()
 
 if __name__ == "__main__":
     # zobraz objekt z datasetu pyplotu jen pro kontrolu
@@ -103,12 +117,14 @@ if __name__ == "__main__":
     voxel_data = [prc.obj_to_voxel(filepath) for filepath in obj_files]
     data_loader = torch.utils.data.DataLoader(voxel_data, batch_size=BATCH_SIZE, shuffle=True)
 
-    generator = Generator(latent_dim=LATENT_DIM, output_dim=32 * 32 * 32)
-    discriminator = Discriminator(input_dim=32 * 32 * 32)
+    generator = Generator(latent_dim=LATENT_DIM, output_dim=32 * 32 * 32).to(device)
+    discriminator = Discriminator(input_dim=32 * 32 * 32).to(device)
+    #print(f"generator: {next(generator.parameters()).device}")
+    #print(f"diskriminator: {next(discriminator.parameters()).device}")
 
     train_gan(generator, discriminator, data_loader, num_epochs=EPOCHS, latent_dim=LATENT_DIM)
 
     # Generuj objekt
-    z = torch.randn(1, LATENT_DIM)
-    generated_voxel = generator(z).detach().numpy().squeeze()
+    z = torch.randn(1, LATENT_DIM).to(device)
+    generated_voxel = generator(z).detach().cpu().numpy().squeeze()
     prc.voxel_to_obj(generated_voxel, "generated_object.obj")
