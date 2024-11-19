@@ -9,7 +9,7 @@ from gan import Generator, LATENT_DIM
 SAVE_DIR = "generated"
 os.makedirs(SAVE_DIR, exist_ok=True)
 def generate_object(weight_file, output_file=os.path.join(SAVE_DIR, "generated_obj.obj")):
-    generator = Generator(latent_dim=LATENT_DIM, output_dim=64 * 64 * 64)
+    generator = Generator(latent_dim=LATENT_DIM, output_dim=32 * 32 * 32)
     generator.load_state_dict(torch.load(weight_file))
     generator.eval()
 

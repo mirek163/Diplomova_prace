@@ -38,14 +38,12 @@ class Generator(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 1024),
             nn.ReLU(),
-            nn.Linear(1024, 4096),
-            nn.ReLU(),
-            nn.Linear(4096, output_dim),
+            nn.Linear(1024, output_dim),
             nn.Tanh()
         )
 
     def forward(self, z):
-        return self.model(z).view(-1, 64, 64, 64)  # úpravy do voxel mřížky
+        return self.model(z).view(-1, 32, 32, 32)  # úpravy do voxel mřížky
 
 
 class Discriminator(nn.Module):
@@ -53,13 +51,11 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.model = nn.Sequential(
             #...........................
-            nn.Linear(input_dim, 4096),
+            nn.Linear(input_dim, 1024),
             nn.LeakyReLU(0.2),
             #přidání dropoutu pro zabránění overfittingu
             #nn.Dropout(0.3),
             #...
-            nn.Linear(4096, 1024),
-            nn.LeakyReLU(0.2),
             nn.Linear(1024, 512),
             nn.LeakyReLU(0.2),
             # přidání dropoutu pro zabránění overfittingu
@@ -167,8 +163,8 @@ if __name__ == "__main__":
     # Preproces
     data_loader = torch.utils.data.DataLoader(voxel_data, batch_size=BATCH_SIZE, shuffle=True)
 
-    generator = Generator(latent_dim=LATENT_DIM, output_dim=64 * 64 * 64).to(device)
-    discriminator = Discriminator(input_dim=64 * 64 * 64).to(device)
+    generator = Generator(latent_dim=LATENT_DIM, output_dim=32 * 32 * 32).to(device)
+    discriminator = Discriminator(input_dim=32 * 32 * 32).to(device)
 
     # ----- ověření, zda se sít trenuje na gpu: -----
     #print(f"zařízení: {device}")
