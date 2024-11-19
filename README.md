@@ -32,7 +32,7 @@ Pro účely testování jsem udělal funkci na jednoduché zobrazování objketu
 ## 18.11-24.11
 Ï. Implementoval jsem ukládání vah jak pro generátor tak diskriminátor. Možné pokračování po předložení těch vah. V rámci tohohle jsem implementoval, pokud selže program nebo ho ukončím "stopem", dostanu vahy (weight_latest) pro případ, že by se to rozhodlo selhat ke konci trénování. Funkce pro generování .obj souboru na základě vah z generátoru a v poslední řadě úpravu načítání obj souborů a jejich převod do voxel podoby - vizualizace pomocí baru a určení kolik zbývá.
 
-II. Dataset otáčení:
+# Dataset otáčení:
 Základní GAN o 4 vrstvách:
 
 Testy:
@@ -77,3 +77,12 @@ Taktéž je možné, že tato základní neuronová sít to prostě nezvlada a c
 
 Bylo by dobré se zároveň zaměřit na načítání souborů z obj do voxelu. Trvání této procedury je někdy i několik minut. Koukal jsme na možnosti a asi nejlepší by bylo, když bych vytvořil vždy cache soubor např. typu .npy, který mohu už načítat a nebudu se ztrácet čas při každém načítání-> tedy načítání obj by proběhlo jen jednou.
 
+
+# Dataset - Pohyb okna:
+
+Základní GAN se 4 vrstvami:
+Hlavním problémem je velmi malá mřížka pro okna, což znamená, že okna nejsou dostatečně reprezentována – fakticky jde pouze o dva voxely, které tvoří celé okno. Přesto jsem při trénování dosáhl výrazně lepších výsledků ve srovnání s pouhým otáčením objektu. Zdá se, že síť se lépe učí i bez jakýchkoli úprav.
+
+Během trénování, přibližně na 5000 epochách, však proces havaroval. Diskriminátor dosáhl hodnoty 100, zatímco generátor spadl na 0. Abych sledoval vývoj trénování, ukládal jsem váhy modelu každých 1000 epoch a použil je pro generování (vizualizaci) výsledků. Bohužel výsledný objekt je spíše chaotická změť náhodných voxelů, což se během dalších epoch nijak nezlepšovalo.
+
+(Viz obrázek č. 1)
