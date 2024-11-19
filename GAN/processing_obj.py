@@ -3,19 +3,19 @@ from matplotlib import pyplot as plt
 from scipy.ndimage import zoom
 import numpy as np
 
-def obj_to_voxel(filepath, grid_size=32, show=False):
+def obj_to_voxel(filepath, grid_size=64, show=False):
 
     mesh = trimesh.load(filepath, force='mesh')
     # scale za pomocí pythonu (mohu nechat v blenderu default hodnoty)
     bounds = mesh.bounds  #[min, max]
     dimensions = bounds[1] - bounds[0]
-    pitch=1/32 # něco špatně :(
+    pitch = 1/ 64 # něco špatně :(
     scale_factor = (grid_size-1)*pitch / max(dimensions) # -1 protože to zakruhluje nahoru a může to přesáhnout
     mesh.apply_scale(scale_factor)
 
     voxels = mesh.voxelized(pitch=pitch)
     voxel_matrix = voxels.matrix
-    new_matrix=pad_to_32x32x32(voxel_matrix)
+    new_matrix = pad_to_grid(voxel_matrix)
     #print(new_matrix)
 
     # vizualizace
@@ -28,14 +28,14 @@ def obj_to_voxel(filepath, grid_size=32, show=False):
         plt.show()
     return new_matrix.astype(np.float32)
 
-def pad_to_32x32x32(voxel_matrix):
+def pad_to_grid(voxel_matrix):
     current_shape = voxel_matrix.shape
-    if current_shape[0] > 32 or current_shape[1] > 32 or current_shape[2] > 32:
+    if current_shape[0] > 64 or current_shape[1] > 64 or current_shape[2] > 64:
         raise ValueError("Velikost matice je větší -> sniž pod 32x32x32")
 
-    pad_x = 32 - current_shape[0]
-    pad_y = 32 - current_shape[1]
-    pad_z = 32 - current_shape[2]
+    pad_x = 64 - current_shape[0]
+    pad_y = 64 - current_shape[1]
+    pad_z = 64 - current_shape[2]
 
     padding = [
         (pad_x // 2, pad_x - pad_x // 2),
