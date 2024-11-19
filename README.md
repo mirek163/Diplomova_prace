@@ -29,4 +29,7 @@ Pořád řeším převod objektu na správné rozměry. Převádím objekt z for
 
 Pro účely testování jsem udělal funkci na jednoduché zobrazování objketu skrze matplotlib.
 
+## 18.11-24.11
+Ï. Implementoval jsem ukládání vah jak pro generátor tak diskriminátor. Možné pokračování po předložení těch vah. V rámci tohohle jsem implementoval, pokud selže program nebo ho ukončím "stopem", dostanu vahy (weight_latest) pro případ, že by se to rozhodlo selhat ke konci trénování. Funkce pro generování .obj souboru na základě vah z generátoru a v poslední řadě úpravu načítání obj souborů a jejich převod do voxel podoby - vizualizace pomocí baru a určení kolik zbývá.
+
 
