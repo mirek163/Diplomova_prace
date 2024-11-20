@@ -86,3 +86,17 @@ Hlavním problémem je velmi malá mřížka pro okna, což znamená, že okna n
 Během trénování, přibližně na 5000 epochách, však proces havaroval. Diskriminátor dosáhl hodnoty 100, zatímco generátor spadl na 0. Abych sledoval vývoj trénování, ukládal jsem váhy modelu každých 1000 epoch a použil je pro generování (vizualizaci) výsledků. Bohužel výsledný objekt je spíše chaotická změť náhodných voxelů, což se během dalších epoch nijak nezlepšovalo.
 
 (Viz obrázek č. 1)
+
+# Zjištění problému:
+Výstupem každého voxelu by mělo být buď 0 (není), nebo 1 (je). Nicméně moje síť nepracuje s celými čísly, takže výsledkem je pravděpodobnost, že voxel existuje, což může zahrnovat i záporné hodnoty, i když velmi blízko nule.
+
+Abych to vyřešil, nastavil jsem všechny hodnoty menší než 0,5 na 0, a ty ostatní ponechal. Možná by dávalo smysl přepočítat tyto hodnoty na 1, ale na výsledné chování by to nemělo mít zásadní vliv.
+
+Dříve jsem zobrazoval všechny hodnoty větší než nula, což vedlo k tomu, že výstup tvořila směs náhodných voxelů. Když jsem tento výstup importoval do Blenderu, vygenerovala se plná krychle – všechny voxely byly nastaveny na hodnotu 1.
+
+Přikládám obrázek č. 2 s aktuálním výstupem v Blenderu.
+
+Plán na příští týden:
+- posouvat budouvu  po x ose a různě s ní hýbat.
+- Udelat  deformaci budovy, nebo přidat šum,případně přidat další budovy do datasetu, která budou obdobný
+- Zkusit se podívat, zda neni nejaka voxelizace, co by mi vracela floaty.
