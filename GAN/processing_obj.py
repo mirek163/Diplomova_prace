@@ -15,8 +15,9 @@ def obj_to_voxel(filepath, grid_size=32, show=False):
 
     voxels = mesh.voxelized(pitch=pitch)
     voxel_matrix = voxels.matrix
+    print(voxel_matrix)
     new_matrix = pad_to_grid(voxel_matrix)
-    #print(new_matrix)
+    print(new_matrix)
 
     # vizualizace
     if show:
@@ -47,7 +48,10 @@ def pad_to_grid(voxel_matrix):
 
 def voxel_to_obj(voxel_grid, output_filepath):
     # vxytvoř mesh z voxelu
+    #voxel_grid[0,0,0] = False
+    #print(np.sum(voxel_grid==False))
     voxels = trimesh.voxel.VoxelGrid(voxel_grid)
+    #print(np.sum(voxels.matrix==False))
     mesh = voxels.marching_cubes
     mesh.export(output_filepath)
 
@@ -94,5 +98,7 @@ def obj_to_voxel_default(filepath, grid_size=32):
     print(voxel_matrix.shape)
     return voxel_matrix.astype(np.float32)
 
+if __name__ == "__main__":
 
-
+    Ahoj = obj_to_voxel(r"..\blender\object\small_buildingA\output\window_move\variant_1.obj")
+    voxel_to_obj(Ahoj,r"generated\generated.obj")

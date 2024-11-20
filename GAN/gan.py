@@ -14,12 +14,12 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 LATENT_DIM = 100  # latentní dimenze->výstup generátoru
 EPOCHS = 100000  # počet epoch pro trénování
-BATCH_SIZE = 8  # velikost pro trénování
+BATCH_SIZE = 32  # velikost pro trénování
 LR = 0.0002  # rychlost pro generator a diskriminator
-DATA_DIRECTORY = r"..\blender\object\small_buildingA\output\rotation"
+DATA_DIRECTORY = r"..\blender\object\small_buildingA\output\window_move"
 SAVE_DIR = "weights"  # váhy vygenerované při tréninku
 EPOCHS_WEIGHT = 1000
-EPOCHS_VISUALIZATION = False
+EPOCHS_VISUALIZATION = True
 
 obj_files = glob.glob(os.path.join(DATA_DIRECTORY, "*.obj"))
 os.makedirs(SAVE_DIR, exist_ok=True)
@@ -54,12 +54,12 @@ class Discriminator(nn.Module):
             nn.Linear(input_dim, 1024),
             nn.LeakyReLU(0.2),
             #přidání dropoutu pro zabránění overfittingu
-            #nn.Dropout(0.3),
+            nn.Dropout(0.3),
             #...
             nn.Linear(1024, 512),
             nn.LeakyReLU(0.2),
             # přidání dropoutu pro zabránění overfittingu
-            #nn.Dropout(0.3),
+            nn.Dropout(0.3),
             #...
             nn.Linear(512, 256),
             nn.LeakyReLU(0.2),
@@ -134,10 +134,10 @@ def train_gan(generator, discriminator, data_loader, num_epochs=100, latent_dim=
             if EPOCHS_VISUALIZATION:
                 print(f"Vizualizace mřížky pro epochu {current_epoch}")
                 z = torch.randn(1, latent_dim).to(device)
-                generated_voxel = generator(z).detach().cpu().numpy().squeeze()  # použití cpu misto gpu - pro použití numpy nezbytný
+                generated_voxel = generator(z).detach().numpy().squeeze()  # použití cpu misto gpu - pro použití numpy nezbytný
                 fig = plt.figure()
                 ax = fig.add_subplot(111, projection='3d')
-                ax.voxels(generated_voxel > 0, edgecolor='k')
+                ax.voxels(generated_voxel > 0.5, edgecolor='k')
                 plt.show()
 
 
