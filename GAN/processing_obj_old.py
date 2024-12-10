@@ -1,5 +1,6 @@
 import trimesh
 from matplotlib import pyplot as plt
+from scipy.ndimage import zoom
 import numpy as np
 
 def obj_to_voxel(filepath, grid_size=32, show=False):
@@ -40,7 +41,7 @@ def pad_to_grid(voxel_matrix, grid_size):
     #print(padding)
 ## test s posunem
     random_x_offset = np.random.randint(0, pad_x+1)
-    #print(random_x_offset)
+    print(random_x_offset)
     random_y_offset = np.random.randint(0, pad_y+1)
     padding = [
         ((pad_x + random_x_offset)//2, pad_x - (pad_x + random_x_offset)//2),
@@ -65,49 +66,48 @@ def voxel_to_obj(voxel_grid, output_filepath):
     mesh = voxels.marching_cubes
     mesh.export(output_filepath)
 
-def slice_voxel_grid(voxel_grid, slice_size=32, overlap=8):
-    """Slice a voxel grid into smaller, overlapping slices."""
-    step = slice_size - overlap
-    slices = []
-    grid_size = voxel_grid.shape[0]
-    for x in range(0, grid_size - slice_size + 1, step):
-        for y in range(0, grid_size - slice_size + 1, step):
-            for z in range(0, grid_size - slice_size + 1, step):
-                subgrid = voxel_grid[
-                    x:x+slice_size,
-                    y:y+slice_size,
-                    z:z+slice_size
-                ]
-                slices.append(subgrid)
-    return slices
+    #--------------------------------------
+    #TESTING - NOT USED CURRENTLY FREQUENTLY
+    #--------------------------------------
+def obj_to_voxel_zoom(filepath, grid_size=32):
+    # snaha udelaní linearní interpolace a nastavení objektu na 32x32x32
+    # -> později jsem zvolil nynější metodu, kde doplnuju chybějící mezery 0.
+    pitch = 1/(grid_size)
+    mesh = trimesh.load(filepath, force='mesh')
+    voxels = mesh.voxelized(pitch=pitch)
+    voxel_matrix = voxels.matrix
+    print(f"1.{voxel_matrix.shape}")
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.voxels(voxel_matrix, edgecolor='k')
+    plt.show()
+    # Uprav velikosti
+    scale_factors = (
+        grid_size / voxel_matrix.shape[0],
+        grid_size / voxel_matrix.shape[1],
+        grid_size / voxel_matrix.shape[2]
+    )
+    resized_voxel = zoom(voxel_matrix, scale_factors, order=1, grid_mode=False, cval=0.0, mode='constant')  # linearní interpolace - resample velikosti stejnou velikost voxel (32x32x32)
+    print(f"2.{resized_voxel.shape}")
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.voxels(resized_voxel, edgecolor='k')
+    plt.show()
+
+    return resized_voxel.astype(np.float32)
 
 
-def reconstruct_from_slices(slices, original_size=64, slice_size=32, overlap=8):
-    """Reconstruct a voxel grid from overlapping slices."""
-    step = slice_size - overlap
-    reconstructed = np.zeros((original_size, original_size, original_size), dtype=np.float32)
-    weight_matrix = np.zeros_like(reconstructed)
+def obj_to_voxel_default(filepath, grid_size=32):
+    #převedení bez úprav, zde pitch funguje, avšak nedostavam požadovanou velikost pro mou sít
+    mesh = trimesh.load(filepath, force='mesh')
 
-    index = 0
-    for x in range(0, original_size - slice_size + 1, step):
-        for y in range(0, original_size - slice_size + 1, step):
-            for z in range(0, original_size - slice_size + 1, step):
-                reconstructed[
-                    x:x+slice_size,
-                    y:y+slice_size,
-                    z:z+slice_size
-                ] += slices[index]
-                weight_matrix[
-                    x:x+slice_size,
-                    y:y+slice_size,
-                    z:z+slice_size
-                ] += 1
-                index += 1
-
-    # Normalize overlapping regions
-    reconstructed /= np.maximum(weight_matrix, 1)
-    return reconstructed
-
+    pitch = 1 / (grid_size) # čím menší pitch, tím větší hustota voxelů (64 voxelu za jednotku)
+    voxels = mesh.voxelized(pitch=pitch)
+    voxel_matrix = voxels.matrix
+    print(voxel_matrix.shape)
+    return voxel_matrix.astype(np.float32)
 
 if __name__ == "__main__":
 
