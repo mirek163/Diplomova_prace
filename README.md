@@ -100,3 +100,8 @@ Plán na příští týden:
 - posouvat budouvu  po x ose a různě s ní hýbat.
 - Udelat  deformaci budovy, nebo přidat šum,případně přidat další budovy do datasetu, která budou obdobný
 - Zkusit se podívat, zda neni nejaka voxelizace, co by mi vracela floaty.
+
+##25.11.-10.12
+Udelal jsem posun budov přímo v python codu automaticky.
+Pořad ale narážím na přesnost v objektu tzn. například okna při 32x32x32 nejdou rozeznat. Problém je v tom, že při trénování 64x64x64 mi nestíhá grafika a je to velmi náročné.
+Bylo by možné řešit voxely po řádku nebo sloupci, nebo navržení slicingu 64x64x64 rozdělil na malé části 32x32x32. Počáteční inicializaci jsem udělal a rozpracoval. Možná udělat i nějaké učení na etapy. Třeba síť která generuje hrubý obraz a pak nějaké který dogeneruji rozrezane detaily.
