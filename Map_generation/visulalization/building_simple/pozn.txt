@@ -1,0 +1,3 @@
+Při rozlišení 32×32 jsou silnice na mapě dost blízko u sebe, takže začíná dávat smysl řešit i realističtější rozmístění budov. Funkce BUILDING_SIMPLE proto přidává jen jednu budovu hned vedle silnice – což lépe odpovídá reálnému uspořádání zástavby a při takhle malém rozlišení to působí přirozeněji
+
+Při rozlišení 128x128 tohle není potřeba, protože zachytavam všechny potrebne detaily

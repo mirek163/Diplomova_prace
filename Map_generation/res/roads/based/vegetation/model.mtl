@@ -1,0 +1,8 @@
+# exported by https://3dviewer.net
+newmtl tiny_treats_1
+Kd 1 1 1
+d 1
+Ka 0 0 0
+Ks 1 1 1
+Ns 0
+map_Kd base_color_texture.png

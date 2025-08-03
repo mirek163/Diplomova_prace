@@ -1,0 +1,30 @@
+I když pro vytvoření mapového objektu se víc hodí mapy vygenerované při nízkém rozlišení s dodatečně doplněnými silnicemi, ve skutečnosti už jde o ručně přidané spojnice – takže to úplně neodpovídá realitě. Proto raději pracuju s měřítkem 128×128 a potom to rozsekám na menší 32×32 dlaždice, se kterými se pak lépe trénuje nebo analyzuje.
+
+
+log:
+
+Používám předdefinovanou lokaci washington: 38.9075, -77.0558
+Souradnice: (-77.06480900900901, 38.89849099099099, -77.046790990991, 38.916509009009005)
+Stahuji dopravní prvky...
+  roads: 288 prvků
+  Budovy: 3490 prvků
+Zkouším vegetation {'landuse': ['forest', 'meadow', 'grass', 'farmland', 'orchard', 'vineyard']}...
+  ✓ Nalezeno 32 prvků pro {'landuse': ['forest', 'meadow', 'grass', 'farmland', 'orchard', 'vineyard']}
+Zkouším vegetation {'natural': ['wood', 'tree']}...
+  ✓ Nalezeno 247 prvků pro {'natural': ['wood', 'tree']}
+Zkouším vegetation {'leisure': ['park']}...
+  ✓ Nalezeno 42 prvků pro {'leisure': ['park']}
+Zkouším vodní tag {'natural': ['water']}...
+  ✓ Nalezeno 15 vodních prvků pro {'natural': ['water']}
+Zkouším vodní tag {'waterway': ['river', 'stream', 'canal']}...
+  ✓ Nalezeno 21 vodních prvků pro {'waterway': ['river', 'stream', 'canal']}
+Zkouším vodní tag {'landuse': ['reservoir']}...
+  ✗ Chyba pro {'landuse': ['reservoir']}: No matching features. Check query location, tags, and log.
+Oblast: 0.4 km × 0.4 km kolem [38.9075, -77.0558]
+roads: 11 prvků
+buildings: 317 prvků
+vegetation: 6 prvků
+water: 2 prvků
+Uložena matice (128, 128) do grid.txt
+Unikátní hodnoty v matici: [0 1 2 3 4]
+Rozlišení: ~3.1 metrů na pixel

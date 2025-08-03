@@ -1,0 +1,1 @@
+Při nízkém rozlišení (např. 32×32) se silnice často nepodaří správně kvůli detailum. Proto používám ROAD_CONNECT, který pomocí algoritmu A* nachází chybějící spojení a silnice doplňuje tak, aby tvořily souvislé části.
