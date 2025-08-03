@@ -1,8 +1,0 @@
-# exported by https://3dviewer.net
-newmtl a15__citybits_texture
-Kd 1 1 1
-d 1
-Ka 0 0 0
-Ks 1 1 1
-Ns 359.9999928474426
-map_Kd a15__base_color_texture.png
