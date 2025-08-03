@@ -1,8 +1,14 @@
 """
 Metriky pro 3D GAN na voxelových datech + ukládání grafů metrik.
-
-Pozn: Pro pytorch3d jsem potřeboval downgradovat cudatoolkit na 11.8 a torch na 2.1.x (ne 2.5.0, jako u WGanu)
+---------------------------------------
+• Chamfer, EMD, Jensen-Shannon, Coverage & MMD
+• FID  (na vícenásobných 2D renderovaných pohledech)
+----------------------------------------------------------
+Závislosti navíc (FPD):
+    pip install torch                   # >=2.1.0 / odpovídající CUDA
+    Pozn: Pro pytorch3d jsem potřeboval downgradovat cudatoolkit na 11.8 a torch na 2.1.x (ne 2.5.0, jako u WGanu)
   pip install --extra-index-url https://miropsota.github.io/torch_packages_builder pytorch3d==0.7.8+pt2.1.0cu118
+----------------------------------------------------------
 """
 import os, warnings, json
 from pathlib import Path
@@ -137,9 +143,6 @@ def render_voxels(voxels, out_dir: str | Path):
                     bbox_inches='tight', pad_inches=0)
         plt.close(fig)
 
-# ----------------------------------------------------------
-# Plotting helpers
-# ----------------------------------------------------------
 
 def save_metric_plots(df: pd.DataFrame, out_dir: str | Path = PLOT_DIR):
     """Vygeneruje a uloží grafy jednotlivých metrik u epoch"""
@@ -209,7 +212,7 @@ def save_specific_weight_plots(epoch: int):
         plt.figure()
         plt.imshow(M_sorted, cmap="viridis", aspect="auto", origin="lower")
         plt.colorbar(label=f"{name} vzdálenost")
-        plt.xlabel("erovaný index (po řazení)")
+        plt.xlabel("Gerovaný index (po řazení)")
         plt.ylabel("Reálný index (po řazení)")
         plt.title(f"{name} – seřazeno clustrem | epocha {epoch}")
         plt.tight_layout()
