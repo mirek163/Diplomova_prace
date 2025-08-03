@@ -7,7 +7,6 @@ Podrobnější testy různých GAN modelů (DCGAN, ProGAN, 3DGAN) včetně vizua
 ## Struktura repozitáře
 
 - **Dataset** – Obsahuje datasety pro trénování 3D objektů a map.
-- **Objects_and_scripts** – Blender soubor, který obsahuje jednotlivé objekty včetně jejich variací a rozsekání.Je zde i skript na generování datasetu rotací modelů kolem jedné osy.
 - **Object_generation** – Skripty pro generování 3D struktury objektů.
 - **Map_generation** – Skripty pro generování, trénování 2D map a sestavení 3D scény.
 - **Evaluation_metrics** – Skripty pro vyhodnocení kvality generovaných modelů.
@@ -36,6 +35,10 @@ Utility:
 ### Hodnocení kvality (složka: `Evaluation_metrics`)
 
 - `metrics.py`: Skript pro vyhodnocení kvality generovaných modelů pomocí metrik (Chamferova vzdálenost, EMD, JSD, Coverage, MMD, FID) a vygenerování grafů.
+
+### Dataset (složka: `Dataset`)
+- `Objects_and_scripts.blend` – Blender soubor, který obsahuje jednotlivé objekty včetně jejich variací a rozsekání.Je zde i skript na generování datasetu rotací modelů kolem jedné osy.
+- `dataset a txt_maps` – Již předvytvořené datasety pro generování 3D objektů amap
 
 ![Výsledný 3D objekt](picture/blender_preview.png)
 ### Podrobně:  
