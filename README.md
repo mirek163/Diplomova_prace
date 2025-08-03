@@ -35,6 +35,9 @@ Utility:
 
 ### Hodnocení kvality (složka: `Evaluation_metrics`)
 
+- `metrics.py`: Skript pro vyhodnocení kvality generovaných modelů pomocí metrik (Chamferova vzdálenost, EMD, JSD, Coverage, MMD, FID) a vygenerování grafů.
+
+![Výsledný 3D objekt](picture/blender_preview.png)
 ### Podrobně:  
 **`metrics.py`**
 
